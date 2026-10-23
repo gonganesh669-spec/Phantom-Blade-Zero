@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phantom Blade Zero | Countdown</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;color:white;
+ font-family:Arial,Helvetica,sans-serif;
+ background:#080606;
+}
+.bg{
+ position:fixed;inset:0;z-index:-2;
+ background:
+ linear-gradient(90deg,#080606ed,#08060685,#08060650),
+ linear-gradient(0deg,#080606,#0000 70%),
+ url('https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=2000&q=85')
+ center/cover no-repeat;
+ transition:background-image .3s;
+}
+main{
+ min-height:100vh;padding:28px 7%;
+ display:flex;flex-direction:column;
+}
+header,footer{
+ display:flex;justify-content:space-between;
+ align-items:center;gap:12px;
+}
+header{border-bottom:1px solid #ffffff40;padding-bottom:20px}
+.logo{letter-spacing:4px;font-size:12px;font-weight:bold}
+.logo span{color:#ed3333}
+.tag{font-size:10px;letter-spacing:2px;color:#e8c99b}
+.content{margin:auto 0;padding:65px 0;max-width:850px}
+.kicker{color:#e8c99b;letter-spacing:5px;font-size:11px}
+h1{
+ font-size:clamp(48px,10vw,105px);
+ line-height:.92;letter-spacing:-4px;
+ margin:24px 0;text-transform:uppercase;
+ text-shadow:0 5px 30px #000;
+}
+h1 span{display:block}
+h1 .outline{
+ color:transparent;
+ -webkit-text-stroke:1px white;
+}
+.subtitle{color:#d2c6c0;letter-spacing:2px;font-size:12px;margin:28px 0}
+.timer{
+ display:grid;grid-template-columns:repeat(4,minmax(0,125px));
+ gap:10px;max-width:560px;
+}
+.unit{
+ background:#130d0ddd;border-top:3px solid #ed3333;
+ padding:18px 12px;
+}
+.number{font-size:clamp(28px,5vw,48px);font-weight:bold;font-variant-numeric:tabular-nums}
+.label{font-size:9px;letter-spacing:2px;color:#b9aaa3;margin-top:8px}
+#message{font-size:12px;color:#e8c99b;margin-top:18px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+button,.upload{
+ background:#151010;border:1px solid #ffffff70;color:white;
+ padding:13px 16px;cursor:pointer;font-weight:bold;
+ font-size:10px;letter-spacing:1px;text-transform:uppercase;
+}
+button.primary{background:#df2929;border-color:#df2929}
+button:hover,.upload:hover{filter:brightness(1.25)}
+input[type=file]{display:none}
+.note{font-size:11px;color:#b7aaa4;line-height:1.7;max-width:600px;margin-top:24px}
+footer{border-top:1px solid #ffffff35;padding-top:18px;font-size:9px;letter-spacing:2px;color:#b7aaa4}
+@media(max-width:500px){
+ main{padding:22px}
+ .timer{grid-template-columns:repeat(2,minmax(0,1fr))}
+ h1{letter-spacing:-2px}
+ footer{align-items:flex-start;flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+<main>
+<header>
+ <div class="logo">SHADOW<span>·</span>COUNT / 001</div>
+ <div class="tag">FAN-MADE COUNTDOWN</div>
+</header>
+
+<section class="content">
+ <div class="kicker">THE NEXT CHAPTER APPROACHES</div>
+ <h1><span>Phantom</span><span class="outline">Blade Zero</span></h1>
+ <div class="subtitle">ONE BLADE. NO MERCY. THE COUNTDOWN BEGINS.</div>
+
+ <div class="timer" id="timer">
+  <div class="unit"><div class="number" id="days">--</div><div class="label">DAYS</div></div>
+  <div class="unit"><div class="number" id="hours">--</div><div class="label">HOURS</div></div>
+  <div class="unit"><div class="number" id="minutes">--</div><div class="label">MINUTES</div></div>
+  <div class="unit"><div class="number" id="seconds">--</div><div class="label">SECONDS</div></div>
+ </div>
+
+ <div id="message" aria-live="polite">TARGET: 29 OCTOBER 2026 · 00:00 IST</div>
+
+ <div class="actions">
+  <button class="primary" id="music">♫ SELECT MUSIC</button>
+  <button id="fullscreen">⛶ FULL SCREEN</button>
+  <label class="upload" for="wallpaper">▧ CHANGE WALLPAPER</label>
+  <input id="wallpaper" type="file" accept="image/*">
+  <input id="audiofile" type="file" accept="audio/*">
+ </div>
+
+ <div class="note">
+  An unofficial fan-made countdown page. The target date is configurable
+  and is not a confirmation of the official game release date.
+ </div>
+</section>
+
+<footer>
+ <span>THE WAIT IS PART OF THE BATTLE.</span>
+ <span>BUILT FOR THE SHADOWS</span>
+</footer>
+</main>
+
+<audio id="player" loop></audio>
+
+<script>
+// Target time: October 29, 2026, at midnight India time.
+const target = new Date("2026-10-29T00:00:00+05:30").getTime();
+
+function updateCountdown(){
+ let remaining = target - Date.now();
+ if(remaining <= 0){
+  document.getElementById("days").textContent = "00";
+  document.getElementById("hours").textContent = "00";
+  document.getElementById("minutes").textContent = "00";
+  document.getElementById("seconds").textContent = "00";
+  document.getElementById("message").textContent =
+   "THE COUNTDOWN IS OVER. THE JOURNEY BEGINS.";
+  return;
+ }
+ const d = Math.floor(remaining / 86400000);
+ const h = Math.floor((remaining % 86400000) / 3600000);
+ const m = Math.floor((remaining % 3600000) / 60000);
+ const s = Math.floor((remaining % 60000) / 1000);
+ document.getElementById("days").textContent = String(d).padStart(2,"0");
+ document.getElementById("hours").textContent = String(h).padStart(2,"0");
+ document.getElementById("minutes").textContent = String(m).padStart(2,"0");
+ document.getElementById("seconds").textContent = String(s).padStart(2,"0");
+}
+updateCountdown();
+setInterval(updateCountdown,1000);
+
+// Full-screen button
+document.getElementById("fullscreen").addEventListener("click",async()=>{
+ try{
+  if(!document.fullscreenElement){
+   await document.documentElement.requestFullscreen();
+  }else{
+   await document.exitFullscreen();
+  }
+ }catch(e){
+  document.getElementById("message").textContent =
+   "Full screen is not supported by this browser.";
+ }
+});
+
+// Change wallpaper for the current visit
+document.getElementById("wallpaper").addEventListener("change",e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ if(!file.type.startsWith("image/"))return;
+ const url=URL.createObjectURL(file);
+ document.getElementById("bg").style.backgroundImage=
+  "linear-gradient(90deg,#080606ed,#08060685,#08060650),"+
+  "linear-gradient(0deg,#080606,#0000 70%),url('"+url+"')";
+ document.getElementById("message").textContent=
+  "Wallpaper changed for this visit.";
+});
+
+// Choose a local music file; browsers do not allow forced autoplay.
+const player=document.getElementById("player");
+const audiofile=document.getElementById("audiofile");
+document.getElementById("music").addEventListener("click",async()=>{
+ if(!player.src){
+  audiofile.click();
+  return;
+ }
+ if(player.paused){
+  try{
+   await player.play();
+   document.getElementById("music").textContent="♫ PAUSE MUSIC";
+  }catch(e){}
+ }else{
+  player.pause();
+  document.getElementById("music").textContent="♫ PLAY MUSIC";
+ }
+});
+audiofile.addEventListener("change",async e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ player.src=URL.createObjectURL(file);
+ try{
+  await player.play();
+  document.getElementById("music").textContent="♫ PAUSE MUSIC";
+  document.getElementById("message").textContent="MUSIC PLAYING.";
+ }catch(e){
+  document.getElementById("message").textContent=
+   "Tap the music button to start playback.";
+ }
+});
+</script>
+</body>
+</html>
